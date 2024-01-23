@@ -1,27 +1,31 @@
 import "CoreLibs/crank"
 import "CoreLibs/timer"
+import "CoreLibs/sprites"
+import "CoreLibs/graphics"
+import 'CoreLibs/frameTimer'
+import 'CoreLibs/easing'
 
-import 'ChessViewModel'
+import 'game'
 
-local frameTimer <const> = playdate.frameTimer
-local timer <const> = playdate.timer
-local sprite <const> = playdate.graphics.sprite
+playdate.display.setRefreshRate(30)
+local spriteUpdate <const> = playdate.graphics.sprite.update
+local frametimerUpdate = playdate.frameTimer.updateTimers
+local timerUpdate = playdate.timer.updateTimers
+-- local gfx = playdate.graphics
 
-local chessViewModel = ChessViewModel()
+local game = Game()
 
-playdate.setMinimumGCTime(10)
 
 function playdate.update()
-    sprite.update()
-    playdate.drawFPS(0,0)
-    frameTimer:updateTimers()
-    timer:updateTimers()
+    spriteUpdate()
+    frametimerUpdate()
+    timerUpdate()
 end
+
 
 function playdate.gameWillTerminate()
-    chessViewModel:saveGame()
 end
 
+
 function playdate.deviceWillSleep()
-    chessViewModel:saveGame()
 end

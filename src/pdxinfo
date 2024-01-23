@@ -1,7 +1,7 @@
-name=Chess
+name=HeliAttack
 author=Trent Robison
-description=Chess
-bundleID=com.trent.chess
+description=TODO
+bundleID=com.trent.heliattack
 version=1.0
 buildNumber=1
 imagePath=assets/
