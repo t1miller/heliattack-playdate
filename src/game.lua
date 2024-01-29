@@ -83,6 +83,7 @@ function Game:update()
 	-- self:addCrateIfNeeded()
 	self:addNewHelicopterAndCrateIfNeeded()
 	self:updateCameraPosition(player.position.x)
+	self:updateMenu()
 end
 
 function Game:updateCurrentGun()
@@ -101,6 +102,15 @@ function Game:updateCurrentGun()
 		self.gun:removeMe()
 		self.gun = AnimatedGun(self.inventory:getCurrentGun())
 	end
+end
+
+function Game:updateMenu()
+	menu:updateMenu(
+		self.inventory:getAmmo(),
+		player:getHealth(),
+		self.helisDestroyed,
+		self.inventory:getCurrentGun()
+	)
 end
 
 function Game:addCrateIfNeeded()

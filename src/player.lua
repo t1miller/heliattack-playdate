@@ -153,6 +153,10 @@ function Player:update()
 	self:updateImage()
 end
 
+function Player:getHealth()
+	return self.health
+end
+
 function Player:updateHealth(health)
 	self.health += health
 	print("Player: health="..self.health)

@@ -10,23 +10,25 @@ function Inventory:init()
     self.guns = {}
     self.gunOrder = {}
     self.currentGunIdx = 1
-    self.playerHealth = 100
+    self.currentGunName = ""
 
     --default machine gun
     -- self:addGun(GUN_NAMES.RPG)
     -- self:addGun(GUN_NAMES.GRENADE)
-    self:addGun(GUN_NAMES.UZI)
+    -- self:addGun(GUN_NAMES.UZI)
+    -- self:addGun(GUN_NAMES.MACHINE_GUN)
+    -- self:addGun(GUN_NAMES.RPG)
+    -- self:addGun(GUN_NAMES.SHOTGUN)
     self:addGun(GUN_NAMES.MACHINE_GUN)
-    self:addGun(GUN_NAMES.RPG)
-    self:addGun(GUN_NAMES.SHOTGUN)
+    self:addGun(GUN_NAMES.RAIL)
 end
 
 
 function Inventory:getCurrentGun()
-    local gunName = self.gunOrder[self.currentGunIdx]
-    self.currentGun = gunName
-    print("getCurrentGun() "..gunName.." currentIdx="..self.currentGunIdx.." numGuns="..#self.gunOrder)
-    return self.guns[gunName]
+    -- local gunName = self.gunOrder[self.currentGunIdx]
+    self.currentGunName = self.gunOrder[self.currentGunIdx]
+    -- print("getCurrentGun() "..self.currentGunName.." currentIdx="..self.currentGunIdx.." numGuns="..#self.gunOrder)
+    return self.guns[self.currentGunName]
 end
 
 function Inventory:getCurrentGunName()
@@ -36,7 +38,7 @@ end
 -- 1 - 9 length 9
 -- idx = (9 + 1) % 9
 function Inventory:nextGun()
-    print("next gun: currentIdx="..self.currentGunIdx.." guns="..#self.gunOrder)
+    -- print("next gun: currentIdx="..self.currentGunIdx.." guns="..#self.gunOrder)
     self.currentGunIdx = (self.currentGunIdx % #self.gunOrder) + 1
 end
 
@@ -48,14 +50,18 @@ function Inventory:prevGun()
     end
 end
 
+function Inventory:getAmmo()
+    -- todo
+    return self:getCurrentGun().ammo
+end
 
-function Inventory:addHealth(health)
-    self.playerHealth = self.playerHealth + health
+function Inventory:reduceAmmo(amount)
+    -- todo
 end
 
 function Inventory:isGunTheSame()
     local indexedGun = self.gunOrder[self.currentGunIdx]
-    return indexedGun == self.currentGun
+    return indexedGun == self.currentGunName
 end
 
 
@@ -90,10 +96,10 @@ function Inventory:removeGun(name)
             self.currentGunIdx = 1
         end
 
-        self.currentGun = self.gunOrder[self.currentGunIdx]
+        self.currentGunName = self.gunOrder[self.currentGunIdx]
     end
 end
 
 function Inventory:removeCurrentGun()
-    self:removeGun(self.currentGun)
+    self:removeGun(self.currentGunName)
 end

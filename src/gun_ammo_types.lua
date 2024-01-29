@@ -3,6 +3,8 @@ import 'CoreLibs/timer'
 
 local gfx = playdate.graphics
 
+-- TODO
+-- it makes sense to cache gun images here
 
 -- if adding a new gun type add it to
 -- GUN_NAMES, GUN_TYPE, AMMO_TYPE

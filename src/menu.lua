@@ -12,6 +12,7 @@ function Menu:init(x, y)
     self.health = 100
     self.helisDestroyed = 0
     self.ammo = 0
+    self.gunImagePath = "images/guns/machinegun"
     self.gunImage = gfx.image.new("images/guns/machinegun")
 
     self:setIgnoresDrawOffset(true)
@@ -25,39 +26,39 @@ function Menu:init(x, y)
     self:addSprite()
 end
 
-function Menu:updatePosition(x, y)
-    self:moveTo(x, y)
-end
+function Menu:updateMenu(ammo, health, helisDestroyed, gun)
+    -- print("updateMenu() ammo:"..ammo.." health:"..health.." helisDestroyed:"..helisDestroyed.." gunImagePath"..gunImagePath)
+    if ammo == self.ammo and
+        health == self.health and
+        helisDestroyed == self.helisDestroyed and
+        gun.imgTable == self.gunImagePath then return end
+    
+    if gun.imgTable ~= self.gunImagePath then
+        self.gunImagePath = gun.imgTable
+        self.gunImage = gfx.image.new(gun.imgTable)
+    end
 
-function Menu:updateImg(gunImagePath)
-    -- self.gunImg = gfx.image.new("images/guns/grenadelauncher")
-    self.gunImage = gfx.image.new(gunImagePath)
+    if gun.tag == "machinegun" then
+        self.ammo = "inf"
+    else
+        self.ammo = ammo or self.ammo
+    end
+
+    self.health = health or self.health
+    self.helisDestroyed = helisDestroyed or self.helisDestroyed
+
     self:markDirty()
 end
-
-function Menu:updateAmmo(ammo)
-end
-
-function Menu:updateUserHealth(health)
-end
-
-function Menu:updateHelisDestroyed(destroyedCount)
-end
--- function Menu:update()
-
--- end
-
 
 function Menu:draw()
     gfx.pushContext()
         gfx.setFont(font)
-        gfx.drawText("helis: 300",self.x+2, self.y)
-        gfx.drawText("health: 100",self.x+2, self.y+11)
-        gfx.drawText("ammo: 5000",self.x+2, self.y+22)
+        gfx.drawText("helis: " .. self.helisDestroyed, self.x+2, self.y)
+        gfx.drawText("health: " .. self.health, self.x+2, self.y+11)
+        gfx.drawText("ammo: " .. self.ammo, self.x+2, self.y+22)
         self.gunImage:draw(self.x+2, self.y + 35)
         gfx.setLineWidth(2)
         gfx.drawRect(self.x, self.y, 95, 50)
     gfx.popContext()
-    -- gfx.drawText("ammo: 80",self.x, self.y+40)
 end
 
