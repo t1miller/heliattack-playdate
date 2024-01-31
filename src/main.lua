@@ -9,8 +9,8 @@ import 'game'
 
 playdate.display.setRefreshRate(30)
 local spriteUpdate <const> = playdate.graphics.sprite.update
-local frametimerUpdate = playdate.frameTimer.updateTimers
-local timerUpdate = playdate.timer.updateTimers
+local frametimerUpdate <const> = playdate.frameTimer.updateTimers
+local timerUpdate <const> = playdate.timer.updateTimers
 -- local gfx = playdate.graphics
 
 local game = Game()

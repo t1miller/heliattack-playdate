@@ -1,13 +1,14 @@
 import 'CoreLibs/crank'
 
-import 'player'
-import 'map'
-import 'helicopter'
-import 'crate'
+import 'player/player'
+import 'map/map'
+import 'map/toucan'
+import 'map/crate'
+import 'helicopter/helicopter'
 import 'inventory'
 import 'gun_ammo_types'
-import 'toucan'
 import 'menu'
+import 'gun/animatedgun'
 import 'library/AnimatedSprite'
 
 -- local references
@@ -193,7 +194,7 @@ function Game:movePlayer()
 			self.inventory:addGun(self.crate:getGun())
 			c.other:remove()
 			-- todo add crate gun to inventory
-		elseif c.other.tag == "bullet" and not c.other:isPlayerShooting() then
+		elseif c.other.tag == "bullet" and not c.other:isPlayerShooting() and not PLAYER_METADATA.isInvinsible then
 			player:updateHealth(-1 * AMMO_TYPE.MINIGUN_BULLET.damage)
 			player:showBlood(player.position.x, player.position.y)
 			c.other:remove()

@@ -16,26 +16,20 @@ function Projectile:init(x, y, angle, ammoType)
 
     self.ammo = ammoType
     self.angle = angle
-    -- self.frames = frames or {1,1,2,2,3,3,4,4,5,5,6,6}
-    -- self.damage = damage or 0
-    -- self.angle = angle or 0
-    -- self.useCollideRect = useCollideRect
-    -- self.tag = "projectile"
-    -- self.trajectory = trajectory
-    -- self.xOffset = xOffset*cos(rad(self.angle))
-    -- self.yOffset = yOffset*sin(rad(self.angle))
 
-    -- if duration is set automatically remove projectile after duration ms
+    -- if timeToKill is set automatically remove projectile after timeToKill ms
     if self.ammo.timeToKill then
         local removeMeTimer = playdate.timer.performAfterDelay(self.ammo.timeToKill*1000, function()
             selfself:removeMe()
         end)
     end
 
-    -- todo might need to restart timer
-    self.ammo.easingFunction:pause()
-    self.ammo.easingFunction.discardOnCompletion = false
-    self.ammo.easingFunction:start()
+    self.easingFunction =  playdate.frameTimer.new(
+        self.ammo.easingFunctionFrameDuration, 
+        self.ammo.easingFunctionStartValue, 
+        self.ammo.easingFunctionEndValue, 
+        self.ammo.easingFunctionType
+    )
 
 	self:addState("run", 1, 6, {frames = self.ammo.frames, loop=true})
 	self:setZIndex(1100)
@@ -53,8 +47,8 @@ function Projectile:init(x, y, angle, ammoType)
 end
 
 function Projectile:update()
-    self.dx = self.ammo.easingFunction.value *  cos(rad(self.angle))
-    self.dy = self.ammo.easingFunction.value *  sin(rad(self.angle))
+    self.dx = self.easingFunction.value *  cos(rad(self.angle))
+    self.dy = self.easingFunction.value *  sin(rad(self.angle))
     if not self.ammo.useCollideRect then
         self:moveTo(self.x + self.dx, self.y + self.dy)
     else
@@ -62,17 +56,15 @@ function Projectile:update()
         for i=1,n do
             local other = c[i].other
             if other.tag == "helicopter" then
-                self:remove()
-                self.ammo.easingFunction:remove()
+                self:removeMe()
                 other:hit(self)
             elseif other.tag == "wall" then
-                self:remove()
-                self.ammo.easingFunction:remove()
+                self:removeMe()
             end
         end
 
         if self.x < 0 or self.x > PLAYER_MAX_X or self.y < 0 or self.y > 240 then
-            self:remove()
+            self:removeMe()
         end
     end
 
@@ -80,6 +72,9 @@ function Projectile:update()
 end
 
 function Projectile:removeMe()
+    if self.easingFunction then
+        self.easingFunction:remove()
+    end
     self:remove()
 end
 

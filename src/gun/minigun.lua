@@ -1,6 +1,5 @@
 import "CoreLibs/timer"
 
-import 'gun/animatedgun'
 import 'ammo/bullet'
 
 -- local references
@@ -100,10 +99,7 @@ end
 function MiniGun:startShooting()
     self:changeState("shoot", true)
     keyTimer = time.keyRepeatTimerWithDelay(RATE_OF_FIRE, RATE_OF_FIRE, function ()
-
-        local xOffset = 27 * cos(rad(self.angle))
-        local yOffset = 20 * sin(rad(self.angle))
-        local bullet = Bullet(self.x, self.y, self.angle, AMMO_TYPE.MINIGUN_BULLET)
+        Bullet(self.x, self.y, self.angle, AMMO_TYPE.MINIGUN_BULLET)
     end)
 end
 

@@ -36,6 +36,11 @@ local facing = RIGHT
 local MAX_RUN_VELOCITY = 120
 local runImageIndex = 1
 
+PLAYER_METADATA = {
+    isInvinsible = true,
+    isTimeSlow = false,
+    -- ...
+}
 
 class("Player").extends(gfx.sprite)
 -- 400 x 240 
@@ -96,7 +101,6 @@ function Player:update()
 			else
 				self:airRunRight()
 			end
-
 		end
 	end
 
@@ -105,9 +109,9 @@ function Player:update()
 		self.velocity.x = self.velocity.x * GROUND_FRICTION
 	end
 
-	if playdate.buttonJustPressed("A") or playdate.buttonJustPressed("UP") then
+	if playdate.buttonJustPressed("A") then
 		self:jump()
-	elseif playdate.buttonIsPressed("A") or playdate.buttonIsPressed("UP")then
+	elseif playdate.buttonIsPressed("A") then
 		self:continueJump()
 	end
 

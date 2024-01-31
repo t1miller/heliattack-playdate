@@ -14,11 +14,12 @@ function Inventory:init()
 
     --default machine gun
     -- self:addGun(GUN_NAMES.RPG)
-    -- self:addGun(GUN_NAMES.GRENADE)
+    self:addGun(GUN_NAMES.GRENADE)
     -- self:addGun(GUN_NAMES.UZI)
     -- self:addGun(GUN_NAMES.MACHINE_GUN)
     -- self:addGun(GUN_NAMES.RPG)
     -- self:addGun(GUN_NAMES.SHOTGUN)
+    -- self:addGun(GUN_NAMES.ABOMB)
     self:addGun(GUN_NAMES.MACHINE_GUN)
     self:addGun(GUN_NAMES.RAIL)
 end

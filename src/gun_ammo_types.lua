@@ -170,8 +170,12 @@ AMMO_TYPE = {
         damage = 100,
         frames = {1,1,2,2,3,3,4,4,5,5,6,6},
         useCollideRect = true,
+        easingFunctionFrameDuration = 30,
+        easingFunctionStartValue = 0,
+        easingFunctionEndValue = 1,
+        easingFunctionType = playdate.easingFunctions.inSine
         -- TODO, this wont work if multiple projectiles at same time
-        easingFunction = playdate.frameTimer.new(30, 0, 2, playdate.easingFunctions.inSine)
+        -- easingFunction = playdate.frameTimer.new(30, 0, 1, playdate.easingFunctions.inSine)
     },
     GRENADE = {
         imgTable = gfx.imagetable.new("images/guns/grenade"),
@@ -179,7 +183,7 @@ AMMO_TYPE = {
         yOffset = 30,
         damage = 25,
         frames = {
-            3,3,4,4,5,5,6,6,3,3,4,4,5,5,
+            3,3,4,4,5,5,6,6,
             1,1,1,1,2,2,2,2,
             3,3,4,4,5,5,6,6,3,3,4,4,5,5,6,6,3,3,4,4,5,5,6,6,3,3,4,4,5,5,6,6,
             3,3,4,4,5,5,6,6,3,3,4,4,5,5,6,6,3,3,4,4,5,5,6,6,3,3,4,4,5,5,6,6,
@@ -187,7 +191,12 @@ AMMO_TYPE = {
         },
         useCollideRect = true,
         -- TODO, this wont work if multiple projectiles at same time
-        easingFunction = playdate.frameTimer.new(20, 0, 15, playdate.easingFunctions.inCubic)
+        easingFunctionFrameDuration = 90,
+        easingFunctionStartValue = 0,
+        easingFunctionEndValue = 25,
+        easingFunctionType = playdate.easingFunctions.inCubic,
+        -- easingFunction = playdate.frameTimer.new(90, 0, 25, playdate.easingFunctions.inCubic)
+        -- easingFunction = playdate.frameTimer.new(20, 0, 5, playdate.easingFunctions.inSine)
     },
     RPG = {
         imgTable = gfx.imagetable.new("images/guns/rocket"),
@@ -196,7 +205,11 @@ AMMO_TYPE = {
         damage = 33,
         frames = {1,1,2,2,3,3,4,4,5,5,6,6},
         useCollideRect = true,
-        easingFunction = playdate.frameTimer.new(6, 0, 10, playdate.easingFunctions.inQuint),
+        easingFunctionFrameDuration = 6,
+        easingFunctionStartValue = 0,
+        easingFunctionEndValue = 10,
+        easingFunctionType = playdate.easingFunctions.inQuart,
+        -- easingFunction = playdate.frameTimer.new(6, 0, 10, playdate.easingFunctions.inQuart),
     },
     -- bullet is different than projectiles and has its own class
     MACHINEGUN_BULLET = {
@@ -236,6 +249,8 @@ AMMO_TYPE = {
         xOffset = 40,
         yOffset = 30,
         damage = 100,
+        -- Spear is only type with pre-created easing function because of how
+        -- unique it is
         easingFunction = playdate.frameTimer.new(5, 0, 8, playdate.easingFunctions.linear)
     },
     RAIL = {
@@ -247,8 +262,12 @@ AMMO_TYPE = {
             frames = {1,1,2,2},
             useCollideRect = false,
             timeToKill = .5,
+            easingFunctionFrameDuration = 6,
+            easingFunctionStartValue = 0,
+            easingFunctionEndValue = 0,
+            easingFunctionType = playdate.easingFunctions.inQuint
             -- TODO, this wont work if multiple projectiles at same time
-            easingFunction = playdate.frameTimer.new(6, 0, 0, playdate.easingFunctions.inQuint),
+            -- easingFunction = playdate.frameTimer.new(6, 0, 0, playdate.easingFunctions.inQuint),
         },
         BULLET = {
             xOffset = 30,

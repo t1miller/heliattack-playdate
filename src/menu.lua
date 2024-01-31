@@ -53,12 +53,17 @@ end
 function Menu:draw()
     gfx.pushContext()
         gfx.setFont(font)
+        gfx.setColor(gfx.kColorWhite)
+        gfx.setDitherPattern(0.2, gfx.image.kDitherTypeScreen)
+        gfx.fillRect(self.x, self.y, 95, 50)
+        gfx.setColor(gfx.kColorBlack)
         gfx.drawText("helis: " .. self.helisDestroyed, self.x+2, self.y)
         gfx.drawText("health: " .. self.health, self.x+2, self.y+11)
         gfx.drawText("ammo: " .. self.ammo, self.x+2, self.y+22)
-        self.gunImage:draw(self.x+2, self.y + 35)
+        self.gunImage:draw(self.x+2, self.y + 34)
         gfx.setLineWidth(2)
         gfx.drawRect(self.x, self.y, 95, 50)
+
     gfx.popContext()
 end
 
