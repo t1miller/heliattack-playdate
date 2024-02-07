@@ -10,11 +10,20 @@ function Bullet:init(x, y, angle, ammoType, hitCallback)
     
     self.tag = "bullet"
     self.ammo = ammoType
-    self.dx = (self.ammo.speed) * cos(rad(angle))
-    self.dy = (self.ammo.speed) * sin(rad(angle))
+    self.dx = ((self.ammo.speed) * cos(rad(angle)))
+    self.dy = ((self.ammo.speed) * sin(rad(angle)))
     self.bulletWidth = self.ammo.width or 3
     self.bulletHeight = self.ammo.height or 3
     self.hitCallback = hitCallback
+
+    if PERKS[PERK_NAMES.TIME_SLOW]:isPerkActive() then
+        self.dx /= PERKS[PERK_NAMES.TIME_SLOW].perkValue
+        self.dy /= PERKS[PERK_NAMES.TIME_SLOW].perkValue
+    end
+
+    -- if PERKS[PERK_NAMES.X3_DAMAGE]:isPerkActive() and self:isPlayerShooting() then
+    --     self.ammo.damage *= PERKS[PERK_NAMES.X3_DAMAGE].perkValue
+    -- end
 
     self:setSize(self.bulletWidth, self.bulletHeight)
 	self:setCollideRect(0, 0, self.bulletWidth, self.bulletHeight)
@@ -25,7 +34,6 @@ function Bullet:init(x, y, angle, ammoType, hitCallback)
     )
     self:addSprite()
 end
-
 
 function Bullet:update()
     local x,y,c,n = self:moveWithCollisions(self.x + self.dx, self.y + self.dy)

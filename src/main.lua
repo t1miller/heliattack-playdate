@@ -5,21 +5,21 @@ import "CoreLibs/graphics"
 import 'CoreLibs/frameTimer'
 import 'CoreLibs/easing'
 
+import 'utils'
 import 'game'
 
 playdate.display.setRefreshRate(30)
 local spriteUpdate <const> = playdate.graphics.sprite.update
 local frametimerUpdate <const> = playdate.frameTimer.updateTimers
 local timerUpdate <const> = playdate.timer.updateTimers
--- local gfx = playdate.graphics
 
 local game = Game()
-
 
 function playdate.update()
     spriteUpdate()
     frametimerUpdate()
     timerUpdate()
+    playdate.drawFPS(0, 0)
 end
 
 

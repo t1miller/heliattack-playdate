@@ -1,13 +1,15 @@
-
+import 'toucan'
 
 local gfx <const> = playdate.graphics
+local time <const> = playdate.timer
+local rand <const> = math.random
 
 class("Map").extends(gfx.sprite)
 -- 400 x 240 
 function Map:init()
     Map.super.init(self)
 
-
+	self.toucans = {}
     self.tiles = {
          5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,
          5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,
@@ -23,81 +25,6 @@ function Map:init()
         47,  48,  69,  67,  68,  69,  67,  68,  69,  67,  68,  69,  67,  80, 145, 146, 147, 148,   5,   5,   5,  54,  74,  72,  67,  68,  69,  73,  74,  72,  72,  73,  47,  48,  47,  48,  74,  73,  69,  67,  68,  69,  67,  68,  69,  67,  68,  69,  67,  68,  71,  72,  72,  72,  72,  72,
     }
 
-                                                                                                                              -- medium plant
-                                                                                                                    -- 90,91
-                                                                                                                    -- 106.107
-                                                                                                                    -- 122,123
-
-    -- 59
-    -- 75
-        -- bridge
-        -- 6,7,8,9.10,11,12,13,14
-        -- 22,23,24,25,26,27,28,29,30
-        -- 38,39,49,41,42,43,44,45,46
-
-        -- large plant
-        -- 33,34
-        -- 49,50
-        -- 65,66
-        -- 81,82
-        -- 97,98,99
-        -- 113,114,115
-        
-        -- medium plant
-        -- 90,91
-        -- 106.107
-        -- 122,123
-
-        -- small plant
-        -- 84,85
-        -- 100,101
-
-        -- bush
-        -- 103
-        -- 119,120
-
-        -- small bush
-        -- 121
-
-        -- med plant
-        -- 102
-        -- 118
-
-        -- fossil
-        -- 31, 32
-        -- 47, 48
-
-        -- medium bush
-        --  84 , 85
-        -- 100, 101
-        
-        -- grass
-        -- 86,87,88
-
-        -- med plant
-        --   4
-        --19,20,21
-        --35,36,37
-
-        -- small bush
-        -- 1, 2, 3
-
-        -- medium plant
-        --     93
-        -- 108,109,110
-        -- 124,125,126
-
-        -- vine
-        -- 129, 130,
-        -- 145, 146, 147,
-        -- 161, 162, 163,
-        -- 186,
-
-    -- todo what is this doing?
-    -- self:setBounds(0,   0,   BACKGROUND_WIDTH,   BACKGROUND_HEIGHT 
-	-- player:setMaxX(BACKGROUND_WIDTH - 24)
-
-
     local tilesheet = gfx.imagetable.new("images/map/map")
     self.tilemap = gfx.tilemap.new()
     self.tilemap:setImageTable(tilesheet)
@@ -106,10 +33,10 @@ function Map:init()
     self:setCenter(0,0)
     self:setZIndex(0)
     self:setTilemap(self.tilemap)
-
+    self:initToucans()
+    self:initRandomFlyingToucan()
     self:setupWallSprites()
-
-    -- local  pirate = Pirate(100,200)
+    self:add()
 end
 
 function Map:setupWallSprites()
@@ -143,4 +70,37 @@ function Map:setTileAtPosition(column, row, newTileValue)
 	-- Also,   sprite.addDirtyRect uses screen instead of world coordinates so we also have to add the offset
 	-- gfx.sprite.addDirtyRect(column * TILE_SIZE - TILE_SIZE + cameraX,   row * TILE_SIZE - TILE_SIZE,   TILE_SIZE,   TILE_SIZE)
 	self.tilemap:setTileAtPosition(column, row, newTileValue)
+end
+
+function Map:initRandomFlyingToucan()
+    local randDelay = rand(20000, 30000)
+    local randomTimer = time.keyRepeatTimerWithDelay(randDelay, randDelay,
+        function ()
+            local randY = rand(10, 90)
+            local randSpeed = rand(3, 7)
+            local toucan = Toucan(-30, randY, randSpeed)
+            toucan:start(TOUCAN_ANIMATION_TYPE.FLY)
+        end
+    )
+end
+
+function Map:initToucans()
+	local toucan1 = Toucan(-30, 30, 3)
+	local toucan2 = Toucan(-30, 90, 5)
+	local toucan3 = Toucan(50, 145, 0)
+
+	toucan1:start(TOUCAN_ANIMATION_TYPE.FLY)
+	toucan2:start(TOUCAN_ANIMATION_TYPE.FLY)
+	toucan3:startRandomAnimation()
+
+	table.insert(self.toucans, toucan1)
+	table.insert(self.toucans, toucan2)
+	table.insert(self.toucans, toucan3)
+end
+
+function Map:removeToucans()
+	for i=1, #self.toucans do
+		self.toucans[i]:removeMe()
+	end
+	self.toucans = {}
 end

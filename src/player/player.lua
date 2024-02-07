@@ -1,12 +1,11 @@
 import 'blood'
+import 'perk_types'
 
 -- local references
-local Point = playdate.geometry.point
-local Rect = playdate.geometry.rect
-local vector2D = playdate.geometry.vector2D
-local gfx = playdate.graphics
-local affineTransform = playdate.geometry.affineTransform
-local min, max, abs, floor, cos, rad, sin = math.min, math.max, math.abs, math.floor, math.cos, math.rad, math.sin
+local DEBUG <const> = true
+local vector2D <const> = playdate.geometry.vector2D
+local gfx <const> = playdate.graphics
+local min <const>, max <const>, abs <const>, floor = math.min, math.max, math.abs, math.floor
 
 -- constants
 local dt = 0.05					-- time between frames at 20fps
@@ -36,11 +35,6 @@ local facing = RIGHT
 local MAX_RUN_VELOCITY = 120
 local runImageIndex = 1
 
-PLAYER_METADATA = {
-    isInvinsible = true,
-    isTimeSlow = false,
-    -- ...
-}
 
 class("Player").extends(gfx.sprite)
 -- 400 x 240 
@@ -53,19 +47,27 @@ function Player:init()
 	self:setCenter(0.5, 1)	-- set center point to center bottom middle
     self:moveTo(PLAYER_START_POS)
 	self:setCollideRect(0,0,spriteWidth,PLAYER_HEIGHT)
-	-- self:setMaxX(BACKGROUND_WIDTH - 24)
 
-	self.position = PLAYER_START_POS
-	self.velocity = vector2D.new(0,0)
-	self.health = 100
 	self.tag = "player"
+
+	self:reset()
+	-- self.position = PLAYER_START_POS
+	-- self.velocity = vector2D.new(0,0)
+	-- self.health = 100
+	-- self:add()
 end
 
 function Player:reset()
+	printDebug("Player: reset()", DEBUG)
 	self.position = PLAYER_START_POS
 	self:moveTo(PLAYER_START_POS)
 	self.velocity = vector2D.new(0,0)
 	self.health = 100
+	self:add()
+end
+
+function Player:removeMe()
+	self:remove()
 end
 
 function Player:collisionResponse(other)
@@ -104,7 +106,6 @@ function Player:update()
 		end
 	end
 
-
 	if onGround and (crouch == true or (playdate.buttonIsPressed("left") == false and playdate.buttonIsPressed("right") == false)) then
 		self.velocity.x = self.velocity.x * GROUND_FRICTION
 	end
@@ -114,7 +115,6 @@ function Player:update()
 	elseif playdate.buttonIsPressed("A") then
 		self:continueJump()
 	end
-
 
 	-- gravity
 	self.velocity = self.velocity + GRAVITY_STEP
@@ -139,7 +139,6 @@ function Player:update()
 	end
 	
 	if runImageIndex > 3.5 then runImageIndex = 1 end
-		
 	
 	-- update Player position based on current velocity
 	local velocityStep = self.velocity * dt
@@ -163,23 +162,23 @@ end
 
 function Player:updateHealth(health)
 	self.health += health
-	print("Player: health="..self.health)
-	if self.health <= 0 then
-		self:reset()
-	end
+	self.health = min(self.health, 100)
+	printDebug("Player: health="..self.health, DEBUG)
+	-- if self.health <= 0 then
+	-- 	-- self:reset()
+	-- 	self:gameOverCallback()
+	-- end
 end
 
 -- sets the appropriate sprite image for Player based on the current conditions
 function Player:updateImage()
 
 	if crouch then
-		
 		if facing == LEFT then
 			self:setImage(self.playerImages:getImage(CROUCH), "flipX")
 		else
 			self:setImage(self.playerImages:getImage(CROUCH))
 		end
-		
 	elseif onGround then
 		if facing == LEFT then
 			if self.velocity.x == 0 then
@@ -204,25 +203,16 @@ function Player:updateImage()
 
 end
 
-
-function Player:showBlood(x,y)
-	-- show blood
-	-- local bloodSprite = AnimatedSprite(bloodImgTable)
-	-- bloodSprite:moveTo(x,y)
-	-- bloodSprite:setZIndex(1100)
-	-- bloodSprite:playAnimation()
-	local blood = Blood(x,y)
+function Player:showBlood()
+	Blood(self.position.x, self.position.y)
 end
-
 
 function Player:setOnGround(flag)
 	onGround = flag
 end
 
-
 function Player:setCrouching(flag)
 	crouch = flag
-	
 	if crouch then
 		PLAYER_HEIGHT = 22
 	else
@@ -246,7 +236,6 @@ end
 function Player:runRight()
 	facing = RIGHT
 	self.velocity.x = min(self.velocity.x + RUN_VELOCITY, MAX_VELOCITY)
-	
 end
 
 
@@ -265,7 +254,6 @@ end
 
 
 function Player:jump()
-	
 	-- if feet on ground
 	if onGround then
 		
@@ -274,12 +262,9 @@ function Player:jump()
 		else -- regular jump
 			self.velocity.y = -JUMP_VELOCITY
 		end
-		
 		jumpTimer:reset()
 		jumpTimer:start()
-		
 	end
-	
 end
 
 function Player:continueJump()

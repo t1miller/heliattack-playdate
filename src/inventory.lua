@@ -2,33 +2,36 @@ import 'gun_ammo_types'
 
 class("Inventory").extends()
 
-local max = math.max
+local DEBUG <const> = true
 
 function Inventory:init()
     Inventory.super.init(self)
 
-    self.guns = {}
-    self.gunOrder = {}
-    self.currentGunIdx = 1
-    self.currentGunName = ""
-
+    self:reset()
     --default machine gun
     -- self:addGun(GUN_NAMES.RPG)
-    self:addGun(GUN_NAMES.GRENADE)
+    -- self:addGun(GUN_NAMES.GRENADE)
     -- self:addGun(GUN_NAMES.UZI)
     -- self:addGun(GUN_NAMES.MACHINE_GUN)
     -- self:addGun(GUN_NAMES.RPG)
     -- self:addGun(GUN_NAMES.SHOTGUN)
     -- self:addGun(GUN_NAMES.ABOMB)
-    self:addGun(GUN_NAMES.MACHINE_GUN)
-    self:addGun(GUN_NAMES.RAIL)
+    -- self:addGun(GUN_NAMES.SPEAR)
+    -- self:addGun(GUN_NAMES.MACHINE_GUN)
+    -- self:addGun(GUN_NAMES.RAIL)
 end
 
+function Inventory:reset()
+    printDebug("Inventory: reset()", DEBUG)
+    self.guns = {}
+    self.gunOrder = {}
+    self.currentGunIdx = 1
+    self.currentGunName = ""
+    self:addGun(GUN_NAMES.MACHINE_GUN)
+end
 
 function Inventory:getCurrentGun()
-    -- local gunName = self.gunOrder[self.currentGunIdx]
     self.currentGunName = self.gunOrder[self.currentGunIdx]
-    -- print("getCurrentGun() "..self.currentGunName.." currentIdx="..self.currentGunIdx.." numGuns="..#self.gunOrder)
     return self.guns[self.currentGunName]
 end
 
@@ -39,10 +42,8 @@ end
 -- 1 - 9 length 9
 -- idx = (9 + 1) % 9
 function Inventory:nextGun()
-    -- print("next gun: currentIdx="..self.currentGunIdx.." guns="..#self.gunOrder)
     self.currentGunIdx = (self.currentGunIdx % #self.gunOrder) + 1
 end
-
 
 function Inventory:prevGun()
     self.currentGunIdx -= 1
@@ -52,12 +53,7 @@ function Inventory:prevGun()
 end
 
 function Inventory:getAmmo()
-    -- todo
     return self:getCurrentGun().ammo
-end
-
-function Inventory:reduceAmmo(amount)
-    -- todo
 end
 
 function Inventory:isGunTheSame()
@@ -65,16 +61,20 @@ function Inventory:isGunTheSame()
     return indexedGun == self.currentGunName
 end
 
-
 function Inventory:addGun(gunName)
     if self.guns[gunName] then
-        -- gun type already in inventory
-        -- add more ammo of that type
         self.guns[gunName].ammo = self.guns[gunName].ammo + GUN_TYPE[gunName].ammo
     else
-        -- self.guns[gunName] = GUN_TYPE[gunName]
         self.guns[gunName] = deepcopy(GUN_TYPE[gunName])
         table.insert(self.gunOrder, gunName)
+    end
+end
+
+function Inventory:addPerk(perkName, player)
+    if perkName == PERK_NAMES.ADD_HEALTH then
+        player:updateHealth(PERKS[PERK_NAMES.ADD_HEALTH].perkValue)
+    else
+        PERKS[perkName]:setActive()
     end
 end
 
@@ -103,4 +103,12 @@ end
 
 function Inventory:removeCurrentGun()
     self:removeGun(self.currentGunName)
+end
+
+function Inventory:addItem(crate, player)
+    if crate:isCrateAGun() then
+        self:addGun(crate:getItemName())
+    else
+        self:addPerk(crate:getItemName(), player)
+    end
 end

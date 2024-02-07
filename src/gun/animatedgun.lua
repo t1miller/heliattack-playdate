@@ -7,24 +7,21 @@ import 'library/AnimatedSprite'
 
 
 -- local references
-local gfx = playdate.graphics
-local time = playdate.timer
+local gfx <const> = playdate.graphics
+local time <const> = playdate.timer
 local min, max, abs, floor, cos, rad, sin, atan = math.min, math.max, math.abs, math.floor, math.cos, math.rad, math.sin, math.atan
 
-local fullAutoTimer
--- todo need to stop this timer when Animated sprite is destroyed
--- also stop the other timer
 
 class("AnimatedGun").extends(AnimatedSprite)
 function AnimatedGun:init(gunType)
     AnimatedGun.super.init(self,gfx.imagetable.new(gunType.imgTable))
-    local selfself = self
 
     self.gun = gunType
     self.prevFiredTime = nil
     self.angle = 0
     self.isImageFlipped = false
     self.autoAimEnabled = true
+    self.autoFireEnabled = false
     self.helicopterX = 0
     self.helicopterY = 0
 
@@ -37,18 +34,23 @@ function AnimatedGun:init(gunType)
 	self:changeState("idle_yes_fire", true)
 	self:setZIndex(1000)
 
-    -- this controls the gun image to show the gun is in the ready to fire
-    -- positions or its still waiting to reload
-    self.reloadDoneTimer = time.performAfterDelay(self.gun.reloadTime * 1000, function ()
-        if self.isImageFlipped then
-            selfself:changeState("idle_yes_fire_flipped", true)
+    self.shootingTimer = time.keyRepeatTimerWithDelay(self.gun.reloadTime * 1000, self.gun.reloadTime * 1000, function ()
+        if self.autoFireEnabled then
+            -- button is held down, keep shooting
+            self:shoot()
         else
-            selfself:changeState("idle_yes_fire", true)
+            -- button released, stop shooting
+            self:startReadyToShootAnimation()
+            if self.shootingTimer then
+                self.shootingTimer:pause()
+            end
         end
-        print("AnimatedGun: reloadDoneTimer called")
+        
     end)
-    self.reloadDoneTimer.discardOnCompletion = false
-    self.reloadDoneTimer:pause()
+    -- todo double check this
+    -- self.shootingTimer.discardOnCompletion = false
+    self.shootingTimer:pause()
+
     return self
 end
 
@@ -65,6 +67,7 @@ function AnimatedGun:update()
     self:setRotation(self.angle)
     self:updateAnimation()
 end
+
 --  h
 --     p
 -- opposite = (helicopterY - self.y)
@@ -108,6 +111,15 @@ function AnimatedGun:updateXY(x, y, helicopterX, helicopterY)
     )
 end
 
+-- this controls the gun image to show the gun is in the ready to fire
+-- positions or its still waiting to reload
+function AnimatedGun:startReadyToShootAnimation()
+    if self.isImageFlipped then
+        self:changeState("idle_yes_fire_flipped", true)
+    else
+        self:changeState("idle_yes_fire", true)
+    end
+end
 
 function AnimatedGun:startShootingAnimation()
     if self.isImageFlipped then
@@ -117,27 +129,35 @@ function AnimatedGun:startShootingAnimation()
     end
 end
 
-function AnimatedGun:startShooting(outOfAmmoCallback)
-    print("start shooting")
-
-    if self:canFire() then
-        self.reloadDoneTimer:reset()
-        self.reloadDoneTimer:start()
-
-        self.prevFiredTime = playdate.getCurrentTimeMilliseconds()
-        fullAutoTimer = time.keyRepeatTimerWithDelay(self.gun.reloadTime * 1000, self.gun.reloadTime * 1000, function ()
-            self:startShootingAnimation()
-            self:shootBulletOrProjectile(self.gun, self.x, self.y, self.angle)
-            if self.gun.ammo <= 0 then
-                outOfAmmoCallback()
-            end
-            print("AnimatedGun: full auto timer called")
-        end)
+function AnimatedGun:shoot()
+    self.prevFiredTime = playdate.getCurrentTimeMilliseconds()
+    self:startShootingAnimation()
+    self:shootBulletOrProjectile(self.gun, self.x, self.y, self.angle)
+    if self.gun.ammo <= 0 then
+        self:outOfAmmoCallback()
     end
 end
 
+-- while b button held down keep shooting
+function AnimatedGun:startShooting(outOfAmmoCallback)
+    self.outOfAmmoCallback = outOfAmmoCallback
+    -- need to reset the gun animation
+    if self:canFire() then
+        self.autoFireEnabled = true
+        self:shoot()
+        self.shootingTimer:reset()
+        self.shootingTimer:start()
+    end
+end
+
+-- when b button is un pressed stop shooting
+function AnimatedGun:stopShooting()
+    self.autoFireEnabled = false
+end
+
 function AnimatedGun:shootBulletOrProjectile(gun, x, y, angle)
-    local ammoParams = AMMO_TYPE[gun.ammoType]
+    local ammoParams = deepcopy(AMMO_TYPE[gun.ammoType])
+
     if gun.tag == "machinegun" then
         Bullet(x, y, angle, ammoParams)
     elseif gun.tag == "uzi" then
@@ -148,8 +168,8 @@ function AnimatedGun:shootBulletOrProjectile(gun, x, y, angle)
             Bullet(x, y, (angle - 25) + i * 4, ammoParams)
         end
     elseif gun.tag == "railgun" then
-        local projectile = Projectile(x, y, angle, AMMO_TYPE.RAIL.PROJECTILE)
-        Bullet(x, y, angle, AMMO_TYPE.RAIL.BULLET, function ()
+        local projectile = Projectile(x, y, angle, deepcopy(AMMO_TYPE.RAIL.PROJECTILE))
+        Bullet(x, y, angle, deepcopy(AMMO_TYPE.RAIL.BULLET), function ()
             projectile:removeMe()
         end)
     elseif gun.tag == "speargun" then
@@ -171,18 +191,24 @@ function AnimatedGun:canFire()
            or playdate.getCurrentTimeMilliseconds() - self.prevFiredTime >= self.gun.reloadTime*1000
 end
 
-function AnimatedGun:stopShooting()
-    if fullAutoTimer then
-        fullAutoTimer:remove()
+function AnimatedGun:getReloadProgress()
+    if not self.prevFiredTime then
+        return 0
+    else
+        local timeRemainingRatio = (playdate.getCurrentTimeMilliseconds() - self.prevFiredTime) / (self.gun.reloadTime * 1000)
+        local timeRemainingPercent = timeRemainingRatio * 100
+        if timeRemainingPercent > 100 then
+            -- no reload neccessary, we can shoot immediately
+           return 0
+        else
+            return timeRemainingPercent
+        end
     end
 end
 
 function AnimatedGun:removeMe()
-    if self.reloadDoneTimer then
-        self.reloadDoneTimer:remove()
-    end
-    if fullAutoTimer then
-        fullAutoTimer:remove()
+    if self.shootingTimer then
+        self.shootingTimer:remove()
     end
     self:remove()
 end

@@ -7,21 +7,19 @@ import 'gun/minigun'
 import 'explosion'
 
 -- local references
-local gfx = playdate.graphics
-local timer = playdate.timer
-local frameTimer = playdate.frameTimer
-local Point = playdate.geometry.point
-local rand = math.random
-local min, max, abs, floor, cos, rad, sin = math.min, math.max, math.abs, math.floor, math.cos, math.rad, math.sin
+local gfx <const> = playdate.graphics
+local timer <const> = playdate.timer
+local frameTimer <const> = playdate.frameTimer
+local Point <const> = playdate.geometry.point
+local abs <const>, rand <const> =  math.abs, math.random
 
--- constants
-local HELICOPTER_HOVER_Y = 0
-local HELICOPTER_FLY_OUT_Y = -50
+local HELICOPTER_HOVER_Y <const> = 0
+local HELICOPTER_FLY_OUT_Y <const> = -50
 
-local FLY_IN_X_OFFSET = 600
-local FLY_AWAY_INTERVAL_SECONDS = 4
-local FOLLOW_MAX_DISTANCE_X = 150
-local ANIMATION_TYPE = {
+local FLY_IN_X_OFFSET <const> = 600
+local FLY_AWAY_INTERVAL_SECONDS <const> = 4
+local FOLLOW_MAX_DISTANCE_X <const> = 150
+local ANIMATION_TYPE <const> = {
     FLY_IN_RIGHT = 1,
     FLY_IN_LEFT = 2,
     FLY_AWAY_LEFT = 3,
@@ -30,13 +28,11 @@ local ANIMATION_TYPE = {
     FOLLOW = 6,
     TAKE_DOWN = 7,
 }
-
--- class variables
-local offMapPos = Point.new(-130, -100)
+local offMapPos <const> = Point.new(-130, -100)
 
 
 class("Helicopter").extends(AnimatedSprite)
-function Helicopter:init(playerX,playerY)
+function Helicopter:init(playerX, playerY)
     Helicopter.super.init(self,gfx.imagetable.new("images/helicopter"))
 
     self.helicopterAngle = 0
@@ -78,8 +74,12 @@ end
 
 
 function Helicopter:hit(other)
+    local damageMultiplier = 1
+    if PERKS[PERK_NAMES.X3_DAMAGE]:isPerkActive() then
+        damageMultiplier = PERKS[PERK_NAMES.X3_DAMAGE].perkValue
+    end
 
-    self.health = self.health - other.ammo.damage
+    self.health = self.health - other.ammo.damage * damageMultiplier
     if self.health <= 0 then
         self:explode()
         return
@@ -275,6 +275,7 @@ function Helicopter:removeMe()
     self.flyAwayTimer:remove()
     self.gun:stopShooting()
     self.gun:remove()
+    self.gun:removeAllBulletSprites()
     self:remove()
 end
 

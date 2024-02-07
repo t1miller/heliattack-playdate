@@ -21,7 +21,6 @@ GUN_NAMES = {
     SHOTGUN = "SHOTGUN",
 }
 
-
 GUN_TYPE = {
     ABOMB = {
         imgTable = "images/guns/abombgun",
@@ -117,11 +116,11 @@ GUN_TYPE = {
         ammo = 10000000,
         reloadTime = .2,
         framesIdleReloaded = 1,
-        framesIdleReloadedFlipped = 1,
-        framesIdleNotReloaded = 1,
-        framesIdleNotReloadedFlipped = 1,
-        framesNormal = {1},
-        framesFlipped = {1},
+        framesIdleReloadedFlipped = 8,
+        framesIdleNotReloaded = 7,
+        framesIdleNotReloadedFlipped = 14,
+        framesNormal = {1,2,3,4,5,6,7},
+        framesFlipped = {8,9,10,11,12,13,14},
         tag = "machinegun",
         ammoType="MACHINEGUN_BULLET"
     },
@@ -134,11 +133,11 @@ GUN_TYPE = {
         ammo = 10,
         reloadTime = 1.5,
         framesIdleReloaded = 1,
-        framesIdleReloadedFlipped = 1,
-        framesIdleNotReloaded = 1,
-        framesIdleNotReloadedFlipped = 1,
-        framesNormal = {1},
-        framesFlipped = {1},
+        framesIdleReloadedFlipped = 8,
+        framesIdleNotReloaded = 7,
+        framesIdleNotReloadedFlipped = 14,
+        framesNormal = {1,2,2,3,3,4,5,5,6,6,7},
+        framesFlipped = {8,9,9,10,10,11,12,12,13,13,14},
         tag = "shotgun",
         ammoType="SHOTGUN_BULLET"
     },
@@ -151,11 +150,11 @@ GUN_TYPE = {
         ammo = 100,
         reloadTime = .05,
         framesIdleReloaded = 1,
-        framesIdleReloadedFlipped = 1,
-        framesIdleNotReloaded = 1,
-        framesIdleNotReloadedFlipped = 1,
-        framesNormal = {1},
-        framesFlipped = {1},
+        framesIdleReloadedFlipped = 8,
+        framesIdleNotReloaded = 7,
+        framesIdleNotReloadedFlipped = 14,
+        framesNormal = {1,2,3,4,5,6,7},
+        framesFlipped = {8,9,10,11,12,13,14},
         tag = "uzi",
         ammoType="UZI_BULLET"
     }
@@ -170,12 +169,10 @@ AMMO_TYPE = {
         damage = 100,
         frames = {1,1,2,2,3,3,4,4,5,5,6,6},
         useCollideRect = true,
-        easingFunctionFrameDuration = 30,
+        easingFunctionFrameDuration = 50,
         easingFunctionStartValue = 0,
-        easingFunctionEndValue = 1,
+        easingFunctionEndValue = 2,
         easingFunctionType = playdate.easingFunctions.inSine
-        -- TODO, this wont work if multiple projectiles at same time
-        -- easingFunction = playdate.frameTimer.new(30, 0, 1, playdate.easingFunctions.inSine)
     },
     GRENADE = {
         imgTable = gfx.imagetable.new("images/guns/grenade"),
@@ -183,20 +180,17 @@ AMMO_TYPE = {
         yOffset = 30,
         damage = 25,
         frames = {
-            3,3,4,4,5,5,6,6,
-            1,1,1,1,2,2,2,2,
+            3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,
+            1,1,1,2,2,2,1,1,1,1,
             3,3,4,4,5,5,6,6,3,3,4,4,5,5,6,6,3,3,4,4,5,5,6,6,3,3,4,4,5,5,6,6,
             3,3,4,4,5,5,6,6,3,3,4,4,5,5,6,6,3,3,4,4,5,5,6,6,3,3,4,4,5,5,6,6,
             3,3,4,4,5,5,6,6,3,3,4,4,5,5,6,6,3,3,4,4,5,5,6,6,3,3,4,4,5,5,6,6,
         },
         useCollideRect = true,
-        -- TODO, this wont work if multiple projectiles at same time
-        easingFunctionFrameDuration = 90,
+        easingFunctionFrameDuration = 40,
         easingFunctionStartValue = 0,
-        easingFunctionEndValue = 25,
+        easingFunctionEndValue = 40,
         easingFunctionType = playdate.easingFunctions.inCubic,
-        -- easingFunction = playdate.frameTimer.new(90, 0, 25, playdate.easingFunctions.inCubic)
-        -- easingFunction = playdate.frameTimer.new(20, 0, 5, playdate.easingFunctions.inSine)
     },
     RPG = {
         imgTable = gfx.imagetable.new("images/guns/rocket"),
@@ -205,11 +199,10 @@ AMMO_TYPE = {
         damage = 33,
         frames = {1,1,2,2,3,3,4,4,5,5,6,6},
         useCollideRect = true,
-        easingFunctionFrameDuration = 6,
-        easingFunctionStartValue = 0,
-        easingFunctionEndValue = 10,
-        easingFunctionType = playdate.easingFunctions.inQuart,
-        -- easingFunction = playdate.frameTimer.new(6, 0, 10, playdate.easingFunctions.inQuart),
+        easingFunctionFrameDuration = 50,
+        easingFunctionStartValue = 3,
+        easingFunctionEndValue = 30,
+        easingFunctionType = playdate.easingFunctions.linear,
     },
     -- bullet is different than projectiles and has its own class
     MACHINEGUN_BULLET = {
@@ -223,7 +216,8 @@ AMMO_TYPE = {
     MINIGUN_BULLET = {
         xOffset = 30,
         yOffset = 30,
-        damage = 3,
+        damage = 5,
+        -- damage = 50,
         speed = 2,
         peletsPerShot = 1,
         isPlayerShooting = false,
@@ -266,8 +260,6 @@ AMMO_TYPE = {
             easingFunctionStartValue = 0,
             easingFunctionEndValue = 0,
             easingFunctionType = playdate.easingFunctions.inQuint
-            -- TODO, this wont work if multiple projectiles at same time
-            -- easingFunction = playdate.frameTimer.new(6, 0, 0, playdate.easingFunctions.inQuint),
         },
         BULLET = {
             xOffset = 30,

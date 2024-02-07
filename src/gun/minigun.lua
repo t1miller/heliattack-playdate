@@ -24,7 +24,7 @@ function MiniGun:init(x,y)
     self.tag = "minigun"
     self.angle = 90
     self.isImageFlipped = false
-    self.damage = 7
+    -- self.damage = 7
 
 	self:addState("shoot", 1, 14, {frames = {1,1,1,2,2,2,3,3,3,4,4,4,5,5,5,6,6,6}, loop=true})
     self:addState("hit", 1, 14, {frames = {7,7,7}, loop=false})
@@ -106,4 +106,13 @@ end
 
 function MiniGun:stopShooting()
     keyTimer:remove()
+end
+
+function MiniGun:removeAllBulletSprites()
+    local sprites = playdate.graphics.sprite.getAllSprites()
+    for i=1, #sprites do
+        if sprites[i].tag == "bullet" then
+            sprites[i]:remove()
+        end
+    end
 end

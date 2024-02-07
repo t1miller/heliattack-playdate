@@ -11,12 +11,20 @@ local min, max, abs, floor, cos, rad, sin, rand = math.min, math.max, math.abs, 
 local PARACHUTE_Y_OFFSET = -50
 local CRATE_SIZE = 30
 local CRATE_TYPE = {
-    {name=GUN_NAMES.ABOMB, parachuteImg="images/crates/parachuteABomb", crateImg="images/crates/abombcrate"},
-    {name=GUN_NAMES.GRENADE, parachuteImg="images/crates/parachuteGrenade", crateImg="images/crates/grenadecrate"},
-    {name=GUN_NAMES.RPG, parachuteImg="images/crates/parachuteBazooka", crateImg="images/crates/bazookacrate"},
-    {name=GUN_NAMES.RAIL, parachuteImg="images/crates/parachuteRail", crateImg="images/crates/railcrate"},
-    {name=GUN_NAMES.SPEAR, parachuteImg="images/crates/parachuteSpear", crateImg="images/crates/spearcrate"},
-    {name=GUN_NAMES.SHOTGUN, parachuteImg="images/crates/parachuteShotgun", crateImg="images/crates/shotguncrate"},
+    -- guns
+    -- {name=GUN_NAMES.ABOMB, parachuteImg="images/crates/parachuteABomb", crateImg="images/crates/abombcrate"},
+    -- {name=GUN_NAMES.GRENADE, parachuteImg="images/crates/parachuteGrenade", crateImg="images/crates/grenadecrate"},
+    -- {name=GUN_NAMES.RPG, parachuteImg="images/crates/parachuteBazooka", crateImg="images/crates/bazookacrate"},
+    -- {name=GUN_NAMES.RAIL, parachuteImg="images/crates/parachuteRail", crateImg="images/crates/railcrate"},
+    -- {name=GUN_NAMES.SPEAR, parachuteImg="images/crates/parachuteSpear", crateImg="images/crates/spearcrate"},
+    -- {name=GUN_NAMES.SHOTGUN, parachuteImg="images/crates/parachuteShotgun", crateImg="images/crates/shotguncrate"},
+    -- {name=GUN_NAMES.UZI, parachuteImg="images/crates/parachuteUzi", crateImg="images/crates/uzicrate"},
+
+    -- perks, todo add invincible
+    {name=PERK_NAMES.ADD_HEALTH, parachuteImg="images/crates/parachuteHealth", crateImg="images/crates/healthcrate"},
+    -- {name=PERK_NAMES.INFINITE_AMMO, parachuteImg="images/crates/parachuteInfiniteAmmo", crateImg="images/crates/infiniteammocrate"},
+    {name=PERK_NAMES.X3_DAMAGE, parachuteImg="images/crates/parachute3xDamage", crateImg="images/crates/3xdamagecrate"},
+    {name=PERK_NAMES.TIME_SLOW, parachuteImg="images/crates/parachuteSlow", crateImg="images/crates/slowcrate"},
 }
 
 
@@ -87,7 +95,20 @@ function Crate:randomCrate()
     return CRATE_TYPE[randIdx]
 end
 
-function Crate:getGun()
+function Crate:isCrateAGun()
+    for k, v in pairs(GUN_NAMES) do
+        if self.crateType.name == v then
+            return true
+        end
+    end
+    return false
+end
+
+-- function Crate:getGun()
+--     return self.crateType.name
+-- end
+
+function Crate:getItemName()
     return self.crateType.name
 end
 
